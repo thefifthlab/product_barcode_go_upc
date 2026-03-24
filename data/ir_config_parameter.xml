@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<!--    <record id="barcode_lookup_api_key_param" model="ir.config_parameter">-->
+<!--        <field name="key">barcode.barcode_lookup_api_key</field>-->
+<!--        <field name="value">YOUR_API_KEY_HERE</field>  &lt;!&ndash; Replace with real key in Settings &ndash;&gt;-->
+<!--    </record>-->
+
+    <!-- Optional: default category if no match found -->
+    <record id="default_product_category_param" model="ir.config_parameter">
+        <field name="key">barcode_import.default_category_id</field>
+        <field name="value" eval="ref('product.product_category_all')"/>
+    </record>
+
+</odoo>

@@ -1,0 +1,50 @@
+<odoo>
+    <record id="view_barcode_lookup_wizard_form" model="ir.ui.view">
+        <field name="name">barcode.lookup.wizard.form</field>
+        <field name="model">barcode.lookup.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Barcode Lookup">
+                <sheet>
+                    <group>
+                        <label for="barcode" string="Scan Barcode"/>
+                        <div class="o_row">
+                            <field name="barcode" placeholder="e.g. 012345678901"
+                                   on_change="1" decoration-bf="1"/>
+                            <button name="action_lookup_barcode" type="object"
+                                    string="Lookup" class="oe_highlight" icon="fa-search"/>
+                        </div>
+                    </group>
+                    <separator string="Results" invisible="not found"/>
+                    <group invisible="not found">
+                        <group>
+                            <field name="product_name"/>
+                            <field name="brand_name"/>
+                            <field name="categ_name"/>
+                        </group>
+                        <group>
+                            <field name="image_1920_preview" widget="image" class="oe_avatar"/>
+                        </group>
+                    </group>
+                    <field name="description_sale" invisible="not found" placeholder="Product Description..."/>
+                    <field name="found" invisible="1"/>
+                </sheet>
+                <footer>
+                    <button name="action_create_product" string="Create Product"
+                            type="object" class="btn-primary" invisible="not found"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_barcode_lookup_wizard" model="ir.actions.act_window">
+        <field name="name">Lookup Barcode</field>
+        <field name="res_model">barcode.lookup.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_barcode_lookup_wizard" name="Barcode Lookup"
+              parent="stock.menu_stock_inventory_control"
+              action="action_barcode_lookup_wizard" sequence="100"/>
+</odoo>
