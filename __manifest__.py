@@ -9,7 +9,7 @@
         'security/ir.model.access.csv',
         'wizard/barcode_lookup_wizard_views.xml',
         'views/res_config_settings_views.xml',
-        'views/barcode_import_views.xml',
+        # 'views/barcode_import_views.xml',
         'data/ir_config_parameter.xml',
         'views/res_partner_views.xml',
         'data/sequences.xml',

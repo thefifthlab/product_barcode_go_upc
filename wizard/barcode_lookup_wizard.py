@@ -17,7 +17,10 @@ class BarcodeLookupWizard(models.TransientModel):
     found = fields.Boolean(default=False)
 
     def action_lookup_barcode(self):
+        """Lookup barcode using GO-UPC API"""
         self.ensure_one()
+
+        # Get API configuration
         params = self.env['ir.config_parameter'].sudo()
         api_key = params.get_param('product_barcode_go_upc.api_key')
         timeout = int(params.get_param('product_barcode_go_upc.timeout', 15))
@@ -30,13 +33,18 @@ class BarcodeLookupWizard(models.TransientModel):
 
         try:
             res = requests.get(url, headers=headers, timeout=timeout)
-            if res.status_code == 404:
-                self.found = False
-                return {'warning': {'title': _("Not Found"), 'message': _("No product found for this barcode.")}}
 
+            # Product not found (404)
+            if res.status_code == 404:
+                self.write({'found': False})
+                raise UserError(_("No product found for this barcode."))
+
+            # Raise for other HTTP errors
             res.raise_for_status()
+
             data = res.json().get('product', {})
 
+            # Update wizard with product data
             self.write({
                 'product_name': data.get('name'),
                 'description_sale': data.get('description'),
@@ -45,14 +53,22 @@ class BarcodeLookupWizard(models.TransientModel):
                 'found': True,
             })
 
+            # Download and save product image if available
             if data.get('imageUrl'):
-                img_res = requests.get(data['imageUrl'], timeout=10)
-                if img_res.ok:
-                    self.image_1920_preview = base64.b64encode(img_res.content)
+                try:
+                    img_res = requests.get(data['imageUrl'], timeout=10)
+                    if img_res.ok:
+                        self.image_1920_preview = base64.b64encode(img_res.content)
+                except Exception:
+                    # Image download failure should not break the whole process
+                    pass
 
+        except requests.exceptions.RequestException as e:
+            raise UserError(_("Error connecting to GO-UPC API: %s") % str(e))
         except Exception as e:
-            raise UserError(_("Error connecting to GO-UPC: %s") % str(e))
+            raise UserError(_("Unexpected error while looking up barcode: %s") % str(e))
 
+        # Re-open the wizard form with updated data
         return {
             'type': 'ir.actions.act_window',
             'res_model': self._name,
